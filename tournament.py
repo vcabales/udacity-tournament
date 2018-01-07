@@ -94,8 +94,7 @@ def getWins():
     conn = connect()
     c = conn.cursor()
     c.execute("SELECT * FROM wins;")
-    wins = []
-    wins.append(c.fetchone())
+    wins = c.fetchall()
     conn.commit()
     conn.close()
     return wins
@@ -105,8 +104,7 @@ def getMatches():
     conn = connect()
     c = conn.cursor()
     c.execute("SELECT * FROM total_matches;")
-    matches = []
-    matches.append(c.fetchone())
+    matches = c.fetchall()
     conn.commit()
     conn.close()
     return matches
@@ -128,36 +126,28 @@ def swissPairings():
     """
     standings = playerStandings()
     total_players = countPlayers()
-    print total_players
     wins = getWins()
-    print wins
     matches = getMatches()
-    print matches
-    if len(matches) == 0: # first time
-        for i in range(total_players):
-            if i % 2 == 0:
-                id1 = standings[i][0]
-                name1 = standings[i][1]
-                id2 = standings[i+1][0]
-                name2 = standings[i+1][1]
-                pairs.append(id1, name1, id2, name2)
-    else:
+    pairs = []
+
     matched = []
 
     for i in range(total_players):
-        id1 = standings[i][0]
-        name1 = standings[i][1]
-        matched.append(standings[i][0])
+        if (standings[i][0] not in matched):
+            id1 = standings[i][0]
+            name1 = standings[i][1]
+            matched.append(standings[i][0])
+        else:
+            continue
+        j = i+1
         while (j < total_players):
             if (standings[j][0] not in matched):
                 if (wins[i][2] == wins[j][2]) and (matches[i][1] == matches[j][1]):
                     id2 = standings[j][0]
-                    name2 - standings[j][1]
+                    name2 = standings[j][1]
                     pairs.append((id1,name1,id2,name2))
                     matched.append(standings[j][0])
                     break
-            else:
-                j += 1
+            j += 1
 
-    print pairs
     return pairs
